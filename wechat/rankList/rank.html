@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<title></title>
+		<style type="text/css">
+			.rank {
+				margin-top: 30px;
+				border: 1px solid red;
+				text-align: center;
+				color: red;
+			}
+			
+			img {
+				width: 30px;
+				height: auto;
+				vertical-align: middle;
+			}
+			
+			.rankli {
+				font-size: 20px;
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="rank">
+			<h1>排名榜</h1>
+			<!--<div class="rankli">第一名：
+				<img src="../../../PHP/bookStore/img/3.jpg" alt="" />
+				<span class="nickname">陈馨</span>
+				：<sapn class="score">0</sapn>
+			</div>
+			<div class="rankli">第一名：
+				<span class="nickname">陈馨</span>
+				：<sapn class="score">0</sapn>
+			</div>-->
+
+		</div>
+	</body>
+	<script src="../JQuery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var rank = document.getElementsByClassName("rank")[0];
+		$.ajax({
+			type: "get",
+			url: "rank.php",
+			success: function(data) {
+				console.log("成功");
+				var obj = JSON.parse(data);
+				console.log(obj);
+				for(var i = 0; i < obj.length; i++) {
+					//var nickname = document.createElement("div");
+					//nickname.innerHTML =data[i]["nickname"];
+					//rank.appendChild(nickname);
+					//var score = document.createElement("span");
+					var rankList = $('<div class="rankli">第' + (i + 1) + '名：<img src="' + obj[i]["img"] + '"/><span class="nickname">' + obj[i]["nickname"] + '</span>：<sapn class="score">' + obj[i]["score"] + '</sapn></div>');
+					$(".rank").append(rankList);
+				}
+			},
+			error: function(errors) {
+				console.log("失败");
+				console.log(errors);
+			}
+		});
+	</script>
+
+</html>
