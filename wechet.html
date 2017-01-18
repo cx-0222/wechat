@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+	<script type="text/javascript">
+	//要进行微信的开发首先要注册微信公众号，
+	//但是我们注册的订阅号能够使用的接口权限太少
+	//所以要学习微信开发我们需要使用测试号来进行学习，
+	//因为测试号拥有我们需要的接口权限
+	//微信开发第一步
+	//1、在验证服务器地址的有效性下面 下载设置token的php
+	//2、将php上传到我们的sae上面，
+	//然后将php中的define("TOKEN", "设置为自己想要的token值");
+	//3、在测试账号管理页面找到 接口配置信息修改
+	//设置URL为我们上传到sae中的php的路径
+	//URL http://lckss.applinzi.com/lcks.php
+	//设置token为我们在php中设置的token
+	//Token lckss
+	//如果提示配置成功表示基本配置已经搞定
+	//经过sae实名认证的一般不会有任何问题，但是没有经过实名认证的
+	//会出现配置失败的情况，自己上网查资料也可以解决，只是在后面进行微信授权
+	//的时候会提示该公众号未经过认证谨慎使用等，所以建议一定要进行实名认证
+	//提高效率
+	//配置成功后就可以进行微信接口的调用
+	//公众平台以access_token为接口调用凭据，来调用接口，
+	//所有接口的调用需要先获取access_token，access_token在2小时内有效，
+	//过期需要重新获取，但1天内获取次数有限，普通用户请求次数为2000次(千)，测试号为200(百)
+	//开发者需自行存储，详见获取接口调用凭据（access_token）文档。
+	
+	
+	//微信网页授权
+	//微信网页授权分为静默模式和弹框模式
+	//静默模式只能获取到用户的openid
+	//弹框模式可以获取到用户的信息
+	
+	//设置以弹框模式进行访问需要将scope设置为snsapi_userinfo
+	//具体要传的参数见微信网页开发中的微信网页授权中的接口文档参数说明
+	//测试接口如下
+	//https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2b0f8ead9cef90ab&redirect_uri=http://lckss.applinzi.com/scope.php&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
+	//设置好之后并不能立刻成功还需要在测试号的网页服务中的
+	//网页帐号	网页授权获取用户基本信息中设置我们授权回调页面域名:lckss.applinzi.com
+	//也就是我们希望回调的网页在哪个域名下面，设置好了之后我们在redirect_uri中设置的
+	//地址必须是在这个域名下的，不然微信服务器会认为错误返回redirect_uri无效
+	//因为实际上是微信的服务器去访问我们的redirect_uri，所以这里的地址需要是服务器路径
+	//所以我们需要把我们想要展示的页面放到我们的云服务器上并把对应的路径放在redirect_uri上
+	//到此完成一个弹框模式的授权及回调
+	//
+	//https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx2b0f8ead9cef90ab&secret=dc9fb7c23c0c47c059affaed7cfc0f05&code=CODE&grant_type=authorization_code
+	//获取用户信息
+	//https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
+	
+	//当我们要调用get方法的接口时首先要知道我们要访问的接口长什么样
+	//然后从接口文档中找到我们需要传什么参数,把参数获取到拼接到我们的
+	//api接口上（也就是我们的请求路径中）
+	//然后我们要了解我们进行这个请求会给我们什么样的返回值（一般是json类型的字符串）
+	//了解json返回的值中每个属性的作用，找到我们需要的属性，然后decode将字符串转化成
+	//我们想要的复杂数据结构就可以通过"."或者"->"来进行调用了
+	//get请求方式可以通过两种获取我们的返回值
+	//1.通过jssdk中我们能够找到的httpGet方法（微信推荐方法）不过他的内部实现需要使用
+	//curl所以必须我们的PHP中支持curl才能够使用该方法，否则无效
+	//查看方式：phpinfo()然后进行查找
+	//2.file_get_contents($api)方法(不推荐使用)
+	
+	//要使用post请求方式需要我们首先知道我们要请求的路径
+	//这里的路径有时会毁三观的在post的url中传参数?access_token=xxx
+	//当然这是人家微信任性勿模仿，但是这里的access_token的值还是要给的。。。
+	//然后我们需要知道我们真正要进行传递的参数，然后将参数们放进一个复杂数据类型
+	//即数组或对象中，然后将复杂对象进行encode得到我们想要的json串
+	//PS:（这里你不放在复杂数据类型中直接自己去拼接json字符串也没有任何问题，只要你不嫌累！！！）
+	//然后我们就可以使用我们自己的httpPost($data,$url)来进行请求并接收返回值了
+	//(第一个是我们要传递的参数的json串，第二个是我们要传递的请求路径)
+	//然后我们要根据接口文档知道我们的返回值的作用，对应的获取并使用
+	//当出现错误的时候不要慌，看好错误的提示即全局码是多少然后去查找相应的错误
+	//http://mp.weixin.qq.com/wiki/10/6380dc743053a91c544ffd2b7c959166.html
+	
+	//当我们微信开发需要使用数据库进行信息存储的时候我们需要使用新浪云的mysql的时候
+	//跟我们平时操作数据库的步骤是一样的，只是传参数的时候发生了区别
+	//sae给我们把数据库名等信息写出了常量供我们使用具体内容参考如下
+	//（主要就是api手册）http://www.sinacloud.com/doc/sae/php/mysql.html
+	//然后在链接mysql的时候需要注意的是第一个参数不仅仅需要填写库的域名还需要
+	//拼接上":".端口的常量这样才是完整的第一个参数，其他就是对号入座即可
+	//在云服务器上对我们的php代码进行调试修改跟在我们本地一样，该怎么调试怎么调试
+	//唯一的区别就是没有代码提示，一般建议在我们的编译器中写好了代码然后拷进去
+	//不然打错字什么的最忧伤了。。。
+	//在这再多提醒大家一句我们ajax请求的php的错误调试使用echo xxx或者var_dump(xxx)
+	//等输出配合exit()实现，在使用了之后记得在ajax中设置好error的function
+	//并且在console.log的时候如果是"cc"+data这种形式打印出来的是cc[object object]
+	//这种形式看不到内部的信息，而里面的信息才是我们真正需要的内容，所以此时要把
+	//data单独console.log，同时在ajax没有出现我们想要的效果的时候要分清楚到底是我们的
+	//php数据没有返回正确还是我们获取到数据后的异步操作用的不对，看看ajax返回到底走的哪个
+	//function即success还是error然后再对数据进行分析，如果确实是我们后台PHP的问题
+	//再去我们的PHP代码中用我上文说的方法进行调试PS:（一般输出会放在mysql_query()之前
+	//防止修改了数据库数据后影响我们的判断和进行数据修改造成的时间损耗）
+	
+	//jssdk的使用首先需要我们进行域名的配置，我们直接设置为我们新浪的一级域名即可
+	//是不带http这些的————applinzi.com
+	lckss.applinzi.com/jssdk/index.php
+	http://lckss.applinzi.com/jssdk/index.php
+	https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2b0f8ead9cef90ab&redirect_uri=http://lckss.applinzi.com/jssdk/index.php&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
+	
+	</script>
+</html>
